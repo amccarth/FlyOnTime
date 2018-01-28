@@ -23,7 +23,7 @@
         android:gravity="top">
         <TextView
             android:id="@+id/airportLabel"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -34,7 +34,7 @@
             />
         <TextView
             android:id="@+id/airportText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -42,10 +42,11 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
             android:layout_toEndOf="@id/airportLabel"
+            android:text="airport"
             />
         <TextView
             android:id="@+id/dateLabel"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -56,13 +57,15 @@
             android:layout_below="@id/airportLabel"/>
         <TextView
             android:id="@+id/dateText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
+            android:layout_below="@id/airportText"
+            android:text="date"
             android:layout_toEndOf="@id/dateLabel"/>
         <TextView
             android:id="@+id/terminalLabel"
@@ -77,17 +80,19 @@
             android:layout_below="@id/dateLabel"/>
         <TextView
             android:id="@+id/terminalText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/terminalLabel"/>
+            android:layout_toEndOf="@id/terminalLabel"
+            android:layout_below="@id/dateText"
+            android:text="terminal"/>
         <TextView
             android:id="@+id/gateLabel"
-            android:layout_width="65dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -98,17 +103,19 @@
             android:layout_below="@id/terminalLabel"/>
         <TextView
             android:id="@+id/gateText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/gateLabel"/>
+            android:layout_toEndOf="@id/gateLabel"
+            android:layout_below="@id/terminalText"
+            android:text="gate"/>
         <TextView
             android:id="@+id/scheduledLabel"
-            android:layout_width="97dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -119,17 +126,19 @@
             android:layout_below="@id/gateLabel"/>
         <TextView
             android:id="@+id/scheduledText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/scheduledLabel"/>
+            android:layout_toEndOf="@id/scheduledLabel"
+            android:layout_below="@id/gateText"
+            android:text="scheduled"/>
         <TextView
             android:id="@+id/estimatedLabel"
-            android:layout_width="110dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -140,17 +149,19 @@
             android:layout_below="@id/scheduledLabel"/>
         <TextView
             android:id="@+id/estimatedText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/estimatedLabel"/>
+            android:layout_toEndOf="@id/estimatedLabel"
+            android:layout_below="@id/scheduledText"
+            android:text="estimated"/>
         <TextView
             android:id="@+id/weatherLabel"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -161,14 +172,55 @@
             android:layout_below="@id/estimatedLabel"/>
         <TextView
             android:id="@+id/weatherText"
-            android:layout_width="87dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:textSize="20sp"
-            android:layout_toEndOf="@id/weatherLabel"/>
+            android:layout_toEndOf="@id/weatherLabel"
+            android:layout_below="@id/estimatedText"
+            android:text="weather"/>
+        <Button
+            android:id="@+id/airport_directions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_centerInParent="true"
+            android:text="Get Directions to Airport"
+            android:visibility="invisible"
+            />
+        <Button
+            android:id="@+id/terminal_directions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_below="@id/airport_directions"
+            android:layout_centerInParent="true"
+            android:text="Get Directions to Terminal"
+            android:visibility="invisible"
+            />
+        <Button
+            android:id="@+id/parking_directions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:layout_below="@id/terminal_directions"
+            android:layout_centerInParent="true"
+            android:text="Get Parking Options"
+            android:visibility="invisible"
+            />
+
     </RelativeLayout>
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
