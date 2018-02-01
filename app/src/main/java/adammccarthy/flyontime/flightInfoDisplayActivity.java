@@ -1,5 +1,7 @@
 package adammccarthy.flyontime;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -28,6 +30,8 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     private Button mAirportDirBtn;
     private Button mTerminalDirBtn;
     private Button mParkingDirBtn;
+    private CharSequence departureLoc;
+    private CharSequence departureTerminal;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -54,7 +58,6 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flight_info_display);
-
         mAirportText = (TextView) findViewById(R.id.airportText);
         mDateText = (TextView) findViewById(R.id.dateText);
         mGateText = (TextView) findViewById(R.id.gateText);
@@ -74,9 +77,33 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mParkingDirBtn = (Button) findViewById(R.id.parking_directions);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        mAirportDirBtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+departureLoc));
+                startActivity(intent);
+            }
+        });
+        mParkingDirBtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+departureLoc+"airport parking"));//this does the same thing as the regular directions, need to find a way to differentiate
+                startActivity(intent);
+            }
+        });
+        mTerminalDirBtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+departureLoc+ " terminal "+departureTerminal));
+                startActivity(intent);
+            }
+        });
+        setToDeparture(); // have default screen be the departure information tab
+        departureLoc = mAirportText.getText();
+        departureTerminal = mTerminalText.getText();
     }
     protected void setToDeparture(){
         //change all text to departure information, change all of these when actually getting api calls
+        mAirportDirBtn.setVisibility(View.INVISIBLE);
+        mTerminalDirBtn.setVisibility(View.INVISIBLE);
+        mParkingDirBtn.setVisibility(View.INVISIBLE);
         mAirportLbl.setVisibility(View.VISIBLE);
         mGateLbl.setVisibility(View.VISIBLE);
         mTerminalLbl.setVisibility(View.VISIBLE);
@@ -100,6 +127,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mWeatherText.setText("Sunny, 85°F");
     }
     protected void setToArrival(){
+        mAirportDirBtn.setVisibility(View.INVISIBLE);
+        mTerminalDirBtn.setVisibility(View.INVISIBLE);
+        mParkingDirBtn.setVisibility(View.INVISIBLE);
         mAirportLbl.setVisibility(View.VISIBLE);
         mGateLbl.setVisibility(View.VISIBLE);
         mTerminalLbl.setVisibility(View.VISIBLE);
