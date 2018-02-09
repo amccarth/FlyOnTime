@@ -159,7 +159,7 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
         String airlineCode = mAirlineCodeView.getText().toString();
         String flightNumber = mFlightNumberView.getText().toString();
         String departureDate = mDepartDateView.getText().toString();
-
+        //  once making API calls add data verification in here
         boolean success = true;
         View focusView = null;
         if(success){
