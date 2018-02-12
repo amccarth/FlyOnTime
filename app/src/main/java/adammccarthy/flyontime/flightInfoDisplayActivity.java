@@ -53,7 +53,40 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         }
 
     };
+    //function from the original project to do main api call
+//    public JsonResult getFlightSchedule(string airCode, string fn, string year, string month, string day)
+//    {
+//        string requestUrl = ApiKeys.fsScheduledFlightsByCarrierFNDate + airCode + "/" + fn + "/departing/" + year + "/" + month + "/" + day + "?appId=" + ApiKeys.fsAppID + "&appKey=+" + ApiKeys.fsAppKey;
+//
+//        WebClient client = new WebClient();
+//        string information = client.DownloadString(requestUrl);
+//
+//        return Json(information, JsonRequestBehavior.AllowGet);
+//    }
 
+    //below is example from the internet on api calls in android, need to convert above to this
+//     try {
+//        URL url = new URL(API_URL + "email=" + email + "&apiKey=" + API_KEY);
+//        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//        try {
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+//            StringBuilder stringBuilder = new StringBuilder();
+//            String line;
+//            while ((line = bufferedReader.readLine()) != null) {
+//                stringBuilder.append(line).append("\n");
+//            }
+//            bufferedReader.close();
+//            return stringBuilder.toString();
+//        }
+//        finally{
+//            urlConnection.disconnect();
+//        }
+//    }
+//            catch(Exception e) {
+//        Log.e("ERROR", e.getMessage(), e);
+//        return null;
+//    }
+//}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -27,5 +27,13 @@
     <string name="title_notifications">Notifications</string>
     <string name="directions">Directions</string>
     <string name="departure">Departure</string>
-    <string name="arrival">Arrival</string>
+    <string name="fsAppID">745e3a7b</string>
+    <string name="fsAppKey">cba6680ba0187670fc07b04f0ee3b57d</string>
+    <string name="fsDelayIndex">https://api.flightstats.com/flex/delayindex/rest/v1/json/airports/</string>
+    <string name="fsFlightStatusByArrivalDate">https://api.flightstats.com/flex/flightstatus/rest/v2/json/flight/status/</string>
+    <string name="fsScheduledFlightsByCarrierFNDate">https://api.flightstats.com/flex/schedules/rest/v1/json/flight/</string>
+    <string name="fsWeather">https://api.flightstats.com/flex/weather/rest/v1/json/metar/</string>
+    <string name="googleCurLocationKey">AIzaSyDSPU5jM6i4BxPw0SYq5JOqq6JbmzW6mcA</string>
+    <string name="googleMapsAppKey">AIzaSyBf3CLng_I7aSdXXBEIJZJEf3_WNK7patA</string>
+    <string name="googleMapsAppURL">https://maps.googleapis.com</string>
 </resources>
