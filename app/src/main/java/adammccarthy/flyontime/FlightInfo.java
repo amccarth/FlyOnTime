@@ -30,6 +30,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,7 +143,32 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
             }
         }
     }
+    //need to find a way to pass multiple parameters to this, also need to parse date when getting. API call works need to find a way to parse out relevant info and pass to next activity
+class testRetriver extends AsyncTask<String, Void, String>{
 
+    protected String doInBackground(String... departDate){
+        try {
+            URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + "DL" + "/" + "2302" + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line).append("\n");
+                }
+                bufferedReader.close();
+                return stringBuilder.toString();
+            } finally {
+                urlConnection.disconnect();
+            }
+        }
+        catch(Exception e){
+            return "";
+        }
+
+    }
+}
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -150,17 +179,36 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
         if (mAuthTask != null) {
             return;
         }
-
+        boolean success = true;
         // Reset errors.
         mAirlineCodeView.setError(null);
         mFlightNumberView.setError(null);
-
+        //string requestUrl = ApiKeys.fsScheduledFlightsByCarrierFNDate + airCode + "/" + fn + "/departing/" + year + "/" + month + "/" + day + "?appId=" + ApiKeys.fsAppID + "&appKey=+" + ApiKeys.fsAppKey;
         // Store values at the time of the login attempt.
         String airlineCode = mAirlineCodeView.getText().toString();
         String flightNumber = mFlightNumberView.getText().toString();
         String departureDate = mDepartDateView.getText().toString();
         //  once making API calls add data verification in here
-        boolean success = true;
+        new testRetriver().execute(airlineCode, flightNumber, departureDate);
+//             try {
+//                 URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + airlineCode + "/" + flightNumber + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
+//                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                 try {
+//                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+//                     StringBuilder stringBuilder = new StringBuilder();
+//                     String line;
+//                     while ((line = bufferedReader.readLine()) != null) {
+//                         stringBuilder.append(line).append("\n");
+//                     }
+//                     bufferedReader.close();
+//                     String test = stringBuilder.toString();
+//                 } finally {
+//                     urlConnection.disconnect();
+//                 }
+//             }
+//        catch(Exception e){
+//            success = false;
+//        }
         View focusView = null;
         if(success){
             Intent intent = new Intent(this, flightInfoDisplayActivity.class);

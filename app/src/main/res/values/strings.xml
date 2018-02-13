@@ -27,6 +27,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="directions">Directions</string>
     <string name="departure">Departure</string>
+    <string name="arrival">Arrival</string>
     <string name="fsAppID">745e3a7b</string>
     <string name="fsAppKey">cba6680ba0187670fc07b04f0ee3b57d</string>
     <string name="fsDelayIndex">https://api.flightstats.com/flex/delayindex/rest/v1/json/airports/</string>
