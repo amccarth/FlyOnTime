@@ -68,6 +68,19 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
     private View mProgressView;
     private View mLoginFormView;
 
+    //added by morgan 2/14/2018
+    //flight information pertaining to time of flight
+    //time of departure
+    //time of boarding
+    //time of arrival
+    //estimated time of passenger arrival to gate/boarding
+    //
+    //hard coded for testing
+    private double timeOfDeparture = System.currentTimeMillis() + 1000000000;
+    private double timeOfBoarding = System.currentTimeMillis() + 750000000;
+    private double timeOfArrival = System.currentTimeMillis() + 835323989;
+    private double estTimeOfPassengerArrival = System.currentTimeMillis() + 850000000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -404,6 +417,64 @@ class testRetriver extends AsyncTask<String, Void, String>{
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    //Methods for getting flight time information
+    @Override
+    protected double getTimeOfBoarding() {
+        return timeOfBoarding;
+    }
+
+    @Override
+    protected double getTimeOfDeparture() {
+        return timeOfDeparture;
+    }
+
+    @Override
+    protected double getTimeofArrival() {
+        return timeOfArrival;
+    }
+
+    @Override
+    protected double getEstTimeOfPassengerArrival() {
+        return estTimeOfPassengerArrival;
+    }
+
+    //Methods for adjusting flight time information
+    @Override
+    private setTimeOfBoarding(double nBoardingTime) {
+        timeOfBoarding = nBoardingTime;
+    }
+
+    @Override
+    private setTimeOfArrival(double nArrivalTime) {
+        timeOfArrival = nArrivalTime;
+    }
+
+    @Override
+    private setTimeOfDeparture(double nDepartureTime) {
+        timeOfDeparture = nDepartureTime;
+    }
+
+    @Override
+    private setEstTimeOfPassegeArrival(double nEstPassengerArrivalTime) {
+        estTimeOfPassengerArrival = nEstPassengerArrivalTime;
+    }
+
+    //Method for checking for estimated passenger arrival time > boarding time
+    //+ changing color of appropriate ui element color
+
+    @Override
+    protected checkEstTimeVsBoardingTime {
+        setContentView(R.layout.activity_flight_info_display)
+        if(getEstTimeOfPassengerArrival() < getTimeOfBoarding()){
+            TextView textElement = (TextView) findViewById(R.id.estimatedText);
+            textElement.setTextColor(0xFF00FF00);
+        }
+        else{
+            TextView textElement = (TextView) findViewById(R.id.estimatedText);
+            textElement.setTextColor(0xFF000000);
         }
     }
 }
