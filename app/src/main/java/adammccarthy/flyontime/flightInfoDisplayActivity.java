@@ -253,7 +253,17 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
                 String jsonString2 = jObject2.getString("tags");
                 JSONArray jsonArray = new JSONArray(jsonString2);
-                JSONObject jObject3 = jsonArray.getJSONObject(1);
+                int conditionIndex = 0;
+                for(int i = 0; i < jsonArray.length(); i++){
+                    JSONObject arrayObj = jsonArray.getJSONObject(i);
+                    String toCheck = arrayObj.toString();
+                    if(toCheck.contains("Prevailing Conditions")){
+                        conditionIndex = i;
+                        break;
+                    }
+                }
+
+                JSONObject jObject3 = jsonArray.getJSONObject(conditionIndex);
                 String last = jObject3.toString();
                 int location = last.indexOf("\"value\":");
                 location = location + 9;
