@@ -20,8 +20,83 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class flightInfoDisplayActivity extends AppCompatActivity {
+    private class flightInfo{
+        private String depAirport;      //dep fields for departure information, arr fields for arrival
+        private String depGate;
+        private String depTerminal;
+        private String depDay;
+        private String depTime;
+        private String depEstimated;
+        private String depWeather;
+
+        private String arrAirport;
+        private String arrGate;
+        private String arrTerminal;
+        private String arrDay;
+        private String arrTime;
+        private String arrEstimated;
+        private String arrWeather;
+
+        flightInfo(String scheduleJson, String statusJson){
+            try {
+                JSONObject scheduleMain = new JSONObject(scheduleJson);
+                //JSONObject sub = main.getJSONObject("request");
+                JSONArray scheduleSub = scheduleMain.getJSONArray("scheduledFlights");
+                JSONObject scheduleSub2 = scheduleSub.getJSONObject(0);
+                depAirport = scheduleSub2.getString("departureAirportFsCode");
+                arrAirport = scheduleSub2.getString("arrivalAirportFsCode");
+                depTerminal = scheduleSub2.getString("departureTerminal");
+                arrTerminal = scheduleSub2.getString("arrivalTerminal");
+                depTime = scheduleSub2.getString("departureTime");
+                arrTime = scheduleSub2.getString("arrivalTime");
+                Date depDate = new Date();
+                Date arrDate = new Date();
+                JSONObject statusMain = new JSONObject(statusJson);
+                JSONArray statusSub = statusMain.getJSONArray("flightStatuses");
+                JSONObject statusSub2 = statusSub.getJSONObject(0);
+                JSONObject statusSub3 = statusSub2.getJSONObject("airportResources");
+                JSONObject statusSub4 = statusSub2.getJSONObject("operationalTimes");
+                JSONObject depEstTimeJ = statusSub4.getJSONObject("estimatedGateDeparture");
+                String depEstTime = depEstTimeJ.getString("dateLocal");
+                JSONObject arrEstTimeJ = statusSub4.getJSONObject("estimatedGateArrival");
+                String arrEstTime = arrEstTimeJ.getString("dateLocal");
+                depGate = statusSub3.getString("departureGate");
+                arrGate = statusSub3.getString("arrivalGate");
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                    depDate = dateFormat.parse(depTime);
+                    arrDate = dateFormat.parse(arrTime);
+                    Date depEst = dateFormat.parse(depEstTime);
+                    Date arrEst = dateFormat.parse(arrEstTime);
+                    depTime = new SimpleDateFormat("H:mm a").format(depDate);
+                    arrTime = new SimpleDateFormat("H:mm a").format(arrDate);
+                    depDay = new SimpleDateFormat("MM/dd/yyyy").format(depDate);
+                    arrDay = new SimpleDateFormat("MM/dd/yyyy").format(arrDate);
+                    depEstimated = new SimpleDateFormat("H:mm a").format(depEst);
+                    arrEstimated = new SimpleDateFormat("H:mm a").format(arrEst);
+
+                }
+                catch(Exception e){
+                    int test = 0;
+                }
+
+
+                //will do JSONObject sub = main.getJSONObject(name);, then form there do sub.getJsonString(name) to get the actual value and add them to their appropriate fields.
+                //might have to use getString instead of getJsonString, will have to try it first
+            }
+            catch (JSONException e){
+                int test = 0;
+                // throw some sort of error
+            }
+        }
+    }
 
     private TextView mAirportText;
     private TextView mGateText;
@@ -42,6 +117,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     private Button mParkingDirBtn;
     private CharSequence departureLoc;
     private CharSequence departureTerminal;
+    private flightInfo FlightInfo;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -100,6 +176,17 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        String scheduleResult = "";
+        String statusResult = "";
+        if(bundle.containsKey("scheduleData")){
+            scheduleResult = bundle.getString("scheduleData");
+        }
+        if(bundle.containsKey("statusData")){
+            statusResult = bundle.getString("statusData");
+        }
+        FlightInfo = new flightInfo(scheduleResult, statusResult);
         setContentView(R.layout.activity_flight_info_display);
         mAirportText = (TextView) findViewById(R.id.airportText);
         mDateText = (TextView) findViewById(R.id.dateText);
@@ -155,19 +242,19 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedLbl.setVisibility(View.VISIBLE);
         mWeatherLbl.setVisibility(View.VISIBLE);
         mAirportText.setVisibility(View.VISIBLE);
-        mAirportText.setText("ATL");
+        mAirportText.setText(FlightInfo.depAirport);
         mGateText.setVisibility(View.VISIBLE);
-        mGateText.setText("32");
+        mGateText.setText(FlightInfo.depGate);
         mTerminalText.setVisibility(View.VISIBLE);
-        mTerminalText.setText("B");
+        mTerminalText.setText(FlightInfo.depTerminal);
         mScheduledText.setVisibility(View.VISIBLE);
-        mScheduledText.setText("11:30 AM");
+        mScheduledText.setText(FlightInfo.depTime);
         mDateText.setVisibility(View.VISIBLE);
-        mDateText.setText("1/31/2018");
+        mDateText.setText(FlightInfo.depDay);
         mEstimatedText.setVisibility(View.VISIBLE);
-        mEstimatedText.setText("12:00 PM");
+        mEstimatedText.setText(FlightInfo.depEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-        new RetrieveWeatherTask().execute("ATL");
+        new RetrieveWeatherTask().execute(FlightInfo.depAirport);
     }
     protected void setToArrival(){
         mAirportDirBtn.setVisibility(View.INVISIBLE);
@@ -181,19 +268,19 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedLbl.setVisibility(View.VISIBLE);
         mWeatherLbl.setVisibility(View.VISIBLE);
         mAirportText.setVisibility(View.VISIBLE);
-        mAirportText.setText("DFW");
+        mAirportText.setText(FlightInfo.arrAirport);
         mGateText.setVisibility(View.VISIBLE);
-        mGateText.setText("12");
+        mGateText.setText(FlightInfo.arrGate);
         mTerminalText.setVisibility(View.VISIBLE);
-        mTerminalText.setText("A");
+        mTerminalText.setText(FlightInfo.arrTerminal);
         mScheduledText.setVisibility(View.VISIBLE);
-        mScheduledText.setText("1:30 PM");
+        mScheduledText.setText(FlightInfo.arrTime);
         mDateText.setVisibility(View.VISIBLE);
-        mDateText.setText("1/31/2018");
+        mDateText.setText(FlightInfo.arrDay);
         mEstimatedText.setVisibility(View.VISIBLE);
-        mEstimatedText.setText("2:00 PM");
+        mEstimatedText.setText(FlightInfo.arrEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-        new RetrieveWeatherTask().execute("DFW");
+        new RetrieveWeatherTask().execute(FlightInfo.arrAirport);
     }
     protected void setToDirections(){
         //make directions buttons visible and remove everything else
@@ -215,7 +302,6 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedLbl.setVisibility(View.INVISIBLE);
         mWeatherLbl.setVisibility(View.INVISIBLE);
     }
-
     class RetrieveWeatherTask extends AsyncTask<String, Void, String> {
 
         protected String weatherResult = "";
@@ -253,17 +339,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
                 String jsonString2 = jObject2.getString("tags");
                 JSONArray jsonArray = new JSONArray(jsonString2);
-                int conditionIndex = 0;
-                for(int i = 0; i < jsonArray.length(); i++){
-                    JSONObject arrayObj = jsonArray.getJSONObject(i);
-                    String toCheck = arrayObj.toString();
-                    if(toCheck.contains("Prevailing Conditions")){
-                        conditionIndex = i;
-                        break;
-                    }
-                }
-
-                JSONObject jObject3 = jsonArray.getJSONObject(conditionIndex);
+                JSONObject jObject3 = jsonArray.getJSONObject(1);
                 String last = jObject3.toString();
                 int location = last.indexOf("\"value\":");
                 location = location + 9;
@@ -288,5 +364,3 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
     }
 }
-
-
