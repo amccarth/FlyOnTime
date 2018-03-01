@@ -3,8 +3,10 @@ package adammccarthy.flyontime;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.icu.util.Calendar;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +36,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -48,7 +52,10 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
+    public String scheduleResult = "";
+    public String statusResult = "";
+    public boolean success1 = false;
+    public boolean success2 = false;
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -88,6 +95,8 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
             }
         });
         mDepartDateView = (EditText) findViewById(R.id.depart_date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        mDepartDateView.setText(dateFormat.format(new Date()));
 
         Button mGetFlightInfoButton = (Button) findViewById(R.id.getFlightInfo);
         mGetFlightInfoButton.setOnClickListener(new OnClickListener() {
@@ -145,11 +154,24 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
     }
 
     //need to find a way to pass multiple parameters to this, also need to parse date when getting. API call works need to find a way to parse out relevant info and pass to next activity
-class testRetriver extends AsyncTask<String, Void, String>{
+class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
+        private String AirlineCode;
+        private String FlightNumber;
+        private Date DepartureDate;
+        private Calendar calendar;
+        //private String DepartureDate;
 
+    FlightScheduleRetreiver(String airlineCode, String flightNum, Date date){
+        AirlineCode = airlineCode;
+        FlightNumber = flightNum;
+        DepartureDate = date;
+        calendar = Calendar.getInstance();
+        calendar.setTime(DepartureDate);
+
+    }
     protected String doInBackground(String... departDate){
         try {
-            URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + "DL" + "/" + "2302" + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
+            URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + AirlineCode + "/" + FlightNumber + "/departing/" + calendar.get(calendar.YEAR) + "/"+(calendar.get(calendar.MONTH)+1)+"/"+ calendar.get(calendar.DAY_OF_MONTH) + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             try {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -159,17 +181,75 @@ class testRetriver extends AsyncTask<String, Void, String>{
                     stringBuilder.append(line).append("\n");
                 }
                 bufferedReader.close();
+                scheduleResult = stringBuilder.toString();
+                success1 = true;
                 return stringBuilder.toString();
             } finally {
                 urlConnection.disconnect();
             }
         }
         catch(Exception e){
-            return "";
+            success1 = false;
         }
-
+        return "";
+    }
+        @Override
+        protected void onPostExecute(String result){
+           //Intent intent = new Intent(super., flightInfoDisplayActivity.class);
+            //flightInfoDisplayActivity.getApplicationContext().startActivity(new Intent(FlightInfo.this, flightInfoDisplayActivity.class));
+            success1 = true;
+            scheduleResult = result;
+            //launch activity to display data
     }
 }
+    class FlightStatusRetreiver extends AsyncTask<String, Void, String>{
+        private String AirlineCode;
+        private String FlightNumber;
+        private Date DepartureDate;
+        private Calendar calendar;
+        //private String DepartureDate;
+
+        FlightStatusRetreiver(String airlineCode, String flightNum, Date date){
+            AirlineCode = airlineCode;
+            FlightNumber = flightNum;
+            DepartureDate = date;
+            calendar = Calendar.getInstance();
+            calendar.setTime(DepartureDate);
+
+        }
+        protected String doInBackground(String... departDate){
+            try {
+                URL url = new URL(getResources().getString(R.string.fsFlightStatusByArrivalDate) + AirlineCode + "/" + FlightNumber + "/arr/" + calendar.get(calendar.YEAR) + "/"+(calendar.get(calendar.MONTH)+1)+"/"+ calendar.get(calendar.DAY_OF_MONTH) + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey)+"&utc=true&airport=");
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line).append("\n");
+                    }
+                    bufferedReader.close();
+                    statusResult = stringBuilder.toString();
+                    success2 = true;
+                    return stringBuilder.toString();
+                } finally {
+                    urlConnection.disconnect();
+                }
+            }
+            catch(Exception e){
+                success2 = false;
+            }
+            return "";
+        }
+        @Override
+        protected void onPostExecute(String result){
+            //Intent intent = new Intent(super., flightInfoDisplayActivity.class);
+            //flightInfoDisplayActivity.getApplicationContext().startActivity(new Intent(FlightInfo.this, flightInfoDisplayActivity.class));
+            success2 = true;
+            statusResult = result;
+            //launch activity to display data
+        }
+    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -180,7 +260,7 @@ class testRetriver extends AsyncTask<String, Void, String>{
         if (mAuthTask != null) {
             return;
         }
-        boolean success = true;
+
         // Reset errors.
         mAirlineCodeView.setError(null);
         mFlightNumberView.setError(null);
@@ -189,8 +269,20 @@ class testRetriver extends AsyncTask<String, Void, String>{
         String airlineCode = mAirlineCodeView.getText().toString();
         String flightNumber = mFlightNumberView.getText().toString();
         String departureDate = mDepartDateView.getText().toString();
+        Date d = new Date();
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:sss");
+            d = dateFormat.parse(departureDate);
+        }
+        catch(Exception e){
+            //need to have some sort error correction in here for the date parsing
+        }
         //  once making API calls add data verification in here
-        new testRetriver().execute(airlineCode, flightNumber, departureDate);
+        FlightScheduleRetreiver scheduleRetreiver = new FlightScheduleRetreiver(airlineCode, flightNumber, d);
+        scheduleRetreiver.execute(airlineCode, flightNumber);
+        FlightStatusRetreiver statusRetreiver = new FlightStatusRetreiver(airlineCode, flightNumber, d);
+        statusRetreiver.execute(airlineCode, flightNumber);
+
 //             try {
 //                 URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + airlineCode + "/" + flightNumber + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
 //                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -210,10 +302,21 @@ class testRetriver extends AsyncTask<String, Void, String>{
 //        catch(Exception e){
 //            success = false;
 //        }
+        boolean waiting = true;
         View focusView = null;
-        if(success){
-            Intent intent = new Intent(this, flightInfoDisplayActivity.class);
-            startActivity(intent);//launch activity to display data
+        while(waiting){
+            if(success1 == false || success2 == false) {
+                continue;
+            }
+            else {
+                waiting = false;
+                Intent intent = new Intent(this, flightInfoDisplayActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("scheduleData", scheduleResult);
+                bundle.putString("statusData", statusResult);
+                intent.putExtras(bundle);
+                startActivity(intent);//launch activity to display data
+            }
         }
 //code below is from original login form code, don't think we'll need but keeping there just in case
         //instead of that need to have in place the api calls to get flightinfo from information entered, for now no verifcation of data

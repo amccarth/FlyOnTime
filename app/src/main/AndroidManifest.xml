@@ -26,7 +26,7 @@
         </activity>
         <activity
             android:name=".flightInfoDisplayActivity"
-            android:label="@string/title_activity_flight_info_display"
+            android:label="Flight Information"
             android:parentActivityName=".FlightInfo">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
