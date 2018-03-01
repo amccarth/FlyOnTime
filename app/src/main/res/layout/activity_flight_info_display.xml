@@ -221,6 +221,18 @@
             android:visibility="invisible"
             />
 
+        <Button
+            android:id="@+id/late_flight_ack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/dateText"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="32dp"
+            android:background="#f00"
+            android:text="Late Flight"
+            android:visibility="invisible"
+            />
+
     </RelativeLayout>
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

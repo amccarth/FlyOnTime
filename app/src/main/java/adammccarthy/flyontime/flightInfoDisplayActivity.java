@@ -1,5 +1,8 @@
 package adammccarthy.flyontime;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class flightInfoDisplayActivity extends AppCompatActivity {
 
@@ -30,6 +34,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     private Button mAirportDirBtn;
     private Button mTerminalDirBtn;
     private Button mParkingDirBtn;
+
+    private Button mLateFlightAckBtn;
+
     private CharSequence departureLoc;
     private CharSequence departureTerminal;
 
@@ -108,6 +115,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mAirportDirBtn = (Button) findViewById(R.id.airport_directions);
         mTerminalDirBtn = (Button) findViewById(R.id.terminal_directions);
         mParkingDirBtn = (Button) findViewById(R.id.parking_directions);
+
+        mLateFlightAckBtn = (Button) findViewById(R.id.late_flight_ack);
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mAirportDirBtn.setOnClickListener(new View.OnClickListener(){
@@ -128,9 +138,33 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        mLateFlightAckBtn.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(flightInfoDisplayActivity.this);
+                alertDialogBuilder.setTitle("Warning");
+                alertDialogBuilder.setMessage("You are late for your flight!");
+                alertDialogBuilder.setCancelable(false);
+                alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+                alertDialogBuilder.setPositiveButton("Acknowledge", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with discard
+                        Toast.makeText(flightInfoDisplayActivity.this, "Acknowledge", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                alertDialogBuilder.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        Toast.makeText(flightInfoDisplayActivity.this, "Cancel", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                alertDialogBuilder.show();
+            }
+        });
+
         setToDeparture(); // have default screen be the departure information tab
         departureLoc = mAirportText.getText();
         departureTerminal = mTerminalText.getText();
+
     }
     protected void setToDeparture(){
         //change all text to departure information, change all of these when actually getting api calls
@@ -158,6 +192,19 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setText("12:00 PM");
         mWeatherText.setVisibility(View.VISIBLE);
         mWeatherText.setText("Sunny, 85°F");
+
+        //Need to discus
+        //google maps api call example
+        //https://maps.googleapis.com/maps/api/distancematrix/json?
+        // origins=Vancouver+BC|Seattle
+        // &destinations=San+Francisco|Victoria+BC
+        // &mode=bicycling&language=fr-FR
+        // &key=YOUR_API_KEY
+        //Suggestion: Use resulting JSON to extract trip duration in seconds, convert to milliseconds
+        //  add to System.currentTimeMillis and compare to ETA
+        if(System.currentTimeMillis() < System.currentTimeMillis() + 10000000) {
+            mLateFlightAckBtn.setVisibility(View.VISIBLE);
+        }
     }
     protected void setToArrival(){
         mAirportDirBtn.setVisibility(View.INVISIBLE);
@@ -184,6 +231,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setText("2:00 PM");
         mWeatherText.setVisibility(View.VISIBLE);
         mWeatherText.setText("Rainy, 87°F");
+        mLateFlightAckBtn.setVisibility(View.INVISIBLE);
     }
     protected void setToDirections(){
         //make directions buttons visible and remove everything else
@@ -204,7 +252,94 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mDateLbl.setVisibility(View.INVISIBLE);
         mEstimatedLbl.setVisibility(View.INVISIBLE);
         mWeatherLbl.setVisibility(View.INVISIBLE);
+        mLateFlightAckBtn.setVisibility(View.INVISIBLE);
     }
 
+    /*
+    //added by morgan 2/14/2018
+    //flight information pertaining to time of flight
+    //time of departure
+    //time of boarding
+    //time of arrival
+    //estimated time of passenger arrival to gate/boarding
+    //
+    //hard coded for testing
+    //{
+    private double timeOfDeparture;
+    private double timeOfBoarding;
+    private double timeOfArrival;
+    private double estTimeOfPassengerArrival;
+
+    private flightInfoDisplayActivity(double tod, double tob, double toa, double eta) {
+        timeOfDeparture = tod;
+        timeOfBoarding = tob;
+        timeOfArrival= toa;
+        estTimeOfPassengerArrival = eta;
+    }
+
+    //Added 2/28/18 - Morgan Beaty
+    //Functions related to flight info object
+    //allow for get/set of object variables
+    //compares eta to actual arrival/boarding times
+
+    //Methods for getting flight time information
+    double newBT = System.currentTimeMillis() + 750000000;
+    double newAT = System.currentTimeMillis() + 835323989;
+    double newDT = System.currentTimeMillis() + 1000000000;
+    double newETA = System.currentTimeMillis() + 850000000;
+    /*
+    flightInfoDisplayActivity fida = new flightInfoDisplayActivity(newDT, newBT, newAT, newETA);
+
+    protected double getTimeOfBoarding() {
+        return this.timeOfBoarding;
+    }
+
+    protected double getTimeOfDeparture() {
+        return this.timeOfDeparture;
+    }
+
+    protected double getTimeofArrival() {
+        return this.timeOfArrival;
+    }
+
+    protected double getEstTimeOfPassengerArrival() {
+        return this.estTimeOfPassengerArrival;
+    }
+
+    //Methods for adjusting flight time information
+    private void setTimeOfBoarding(double nBoardingTime) {
+        this.timeOfBoarding = nBoardingTime;
+    }
+
+    private void setTimeOfArrival(double nArrivalTime) {
+        this.timeOfArrival = nArrivalTime;
+    }
+
+    private void setTimeOfDeparture(double nDepartureTime) {
+        this.timeOfDeparture = nDepartureTime;
+    }
+
+    private void setEstimatedPassengerArrivalTime(double nEstPassengerArrivalTime) {
+        this.estTimeOfPassengerArrival = nEstPassengerArrivalTime;
+    }
+    /*
+    //Method for checking for estimated passenger arrival time > boarding time
+    //+ changing color of appropriate ui element color
+    protected void estTimeVsBoardingTime() {
+        setContentView(R.layout.activity_flight_info_display);
+
+        if (getEstTimeOfPassengerArrival() > getTimeOfBoarding()) {
+            TextView textElement = (TextView) findViewById(R.id.estimatedText);
+            textElement.setTextColor(0xFF000000);
+        } else {
+            //fida.showLateFlightAck();
+            TextView textElement = (TextView) findViewById(R.id.estimatedText);
+            textElement.setTextColor(0xFF00FF00);
+        }
+    }
+
+    //}
+
+    */
 
 }
