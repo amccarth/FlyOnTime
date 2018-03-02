@@ -288,7 +288,6 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setVisibility(View.VISIBLE);
         mEstimatedText.setText(FlightInfo.depEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-<<<<<<< HEAD
         mWeatherText.setText("Sunny, 85°F");
 
         //Need to discus
@@ -303,9 +302,8 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         if(System.currentTimeMillis() < System.currentTimeMillis() + 10000000) {
             mLateFlightAckBtn.setVisibility(View.VISIBLE);
         }
-=======
+
         new RetrieveWeatherTask().execute(FlightInfo.depAirport);
->>>>>>> e1e31de6a038418a78af2b18bd105ef89e8a317c
     }
     protected void setToArrival(){
         mAirportDirBtn.setVisibility(View.INVISIBLE);
@@ -331,12 +329,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setVisibility(View.VISIBLE);
         mEstimatedText.setText(FlightInfo.arrEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-<<<<<<< HEAD
         mWeatherText.setText("Rainy, 87°F");
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
-=======
         new RetrieveWeatherTask().execute(FlightInfo.arrAirport);
->>>>>>> e1e31de6a038418a78af2b18bd105ef89e8a317c
     }
     protected void setToDirections(){
         //make directions buttons visible and remove everything else
@@ -361,7 +356,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     }
     class RetrieveWeatherTask extends AsyncTask<String, Void, String> {
 
-<<<<<<< HEAD
+
     /*
     //added by morgan 2/14/2018
     //flight information pertaining to time of flight
@@ -448,9 +443,8 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     //}
 
     */
-=======
+
         protected String weatherResult = "";
->>>>>>> e1e31de6a038418a78af2b18bd105ef89e8a317c
 
         @Override
         protected String doInBackground(String... airportCode) {
@@ -483,14 +477,24 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                 String jsonString1 = jObject.getString("metar");
                 JSONObject jObject2 = new JSONObject(jsonString1);
 
-                String jsonString2 = jObject2.getString("tags");
-                JSONArray jsonArray = new JSONArray(jsonString2);
-                JSONObject jObject3 = jsonArray.getJSONObject(1);
-                String last = jObject3.toString();
-                int location = last.indexOf("\"value\":");
-                location = location + 9;
-                int length = last.length() - 2;
-                String weather = last.substring(location, length);
+                String jsonString2=jObject2.getString("tags");
+                JSONArray jsonArray=new JSONArray(jsonString2);
+                int conditionIndex=0;
+                for(int i=0; i<jsonArray.length(); i++){
+                    JSONObject arrayObj=jsonArray.getJSONObject(i);
+                    String toCheck=arrayObj.toString();
+                    if(toCheck.contains("Prevailing Conditions")){
+                        conditionIndex=i;
+                        break;
+                    }
+                }
+
+                JSONObject jObject3=jsonArray.getJSONObject(conditionIndex);
+                String last=jObject3.toString();
+                int location=last.indexOf("\"value\":");
+                location=location+9;
+                int length=last.length()-2;
+                String weather=last.substring(location,length);
 
                 String jsonString4 = jObject2.getString("temperatureCelsius");
                 //String tempString = jsonString4.substring(1, (jsonString4.length() - 1));
@@ -507,6 +511,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                 mWeatherText.setText("JSON failed");
             }
         }
+
 
     }
 }
