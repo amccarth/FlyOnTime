@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Fly On TIme</string>
+    <string name="app_name">Fly On Time</string>
 
     <!-- Strings related to login -->
     <string name="prompt_airlineCode">Airline Code</string>
