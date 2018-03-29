@@ -140,10 +140,20 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                     setToDirections();
                     return true;
                 case R.id.action_departure:
-                   setToDeparture();
+                    if(isLayover && mLayoverDisplayCheckBox.isChecked()){
+                        setToLayoverDeparture();
+                    }
+                    else{
+                        setToDeparture();
+                    }
                     return true;
                 case R.id.action_arrival:
-                    setToArrival();
+                    if(isLayover && mLayoverDisplayCheckBox.isChecked()){
+                        setToLayoverArrival();
+                    }
+                    else {
+                        setToArrival();
+                    }
                     return true;
             }
             return false;
@@ -333,6 +343,11 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setVisibility(View.VISIBLE);
         mEstimatedText.setText(FlightInfo.depEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
+
+
 
         //Need to discus
         //google maps api call example
@@ -375,6 +390,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mWeatherText.setVisibility(View.VISIBLE);
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
         new RetrieveWeatherTask().execute(FlightInfo.arrAirport);
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
     }
     protected void setToDirections(){
         //make directions buttons visible and remove everything else
@@ -430,6 +448,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         }
 
         new RetrieveWeatherTask().execute(FlightInfoLayover.depAirport);
+        mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
     }
     protected void setToLayoverArrival(){
         mAirportDirBtn.setVisibility(View.INVISIBLE);
@@ -456,6 +475,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setText(FlightInfoLayover.arrEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
+        mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
         new RetrieveWeatherTask().execute(FlightInfoLayover.arrAirport);
     }
 
