@@ -23,8 +23,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -513,11 +515,15 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
                 String jsonString4 = jObject2.getString("temperatureCelsius");
                 //String tempString = jsonString4.substring(1, (jsonString4.length() - 1));
-                double temp = Double.parseDouble(jsonString4) * (9/5) + 32;
+                double tempC = Double.parseDouble(jsonString4);
+                double tempF = tempC * 1.8 + 32;
+
+                DecimalFormat df = new DecimalFormat("#.##");
+                df.setRoundingMode(RoundingMode.HALF_UP);
 
                 result.append(weather);
                 result.append(" ");
-                result.append(temp);
+                result.append(df.format(tempF));
                 result.append("\u00b0F");
 
                 mWeatherText.setText(result);
