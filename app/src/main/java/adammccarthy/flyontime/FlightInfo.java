@@ -344,8 +344,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
                 bundle.putString("statusData", statusResult);
                 if(mIsLayover){
                     layoverCalls();
-                    String scheduleLayoverResult = scheduleResult;
-                    bundle.putString("scheduleLayoverData", scheduleLayoverResult);
+                    bundle.putString("scheduleLayoverData", scheduleResult);
                     bundle.putString("statusLayoverData", statusResult);
                 }
                 intent.putExtras(bundle);
@@ -407,6 +406,8 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
 
         scheduleResult = "";
         statusResult = "";
+        success1 = false;
+        success2 = false;
         //  once making API calls add data verification in here
         FlightScheduleRetreiver scheduleRetreiverLayover = new FlightScheduleRetreiver(airlineLayoverCode, flightLayoverNumber, d);
         scheduleRetreiverLayover.execute(airlineLayoverCode, flightLayoverNumber);

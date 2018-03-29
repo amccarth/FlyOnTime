@@ -199,11 +199,11 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
             statusResult = bundle.getString("statusData");
         }
         if(bundle.containsKey("scheduleLayoverData")){
-            scheduleResultLayover = bundle.getString("scheduleResultLayover");
+            scheduleResultLayover = bundle.getString("scheduleLayoverData");
             isLayover = true;
         }
         if(bundle.containsKey("statusLayoverData")){
-            statusResultLayover = bundle.getString("statusResultLayover");
+            statusResultLayover = bundle.getString("statusLayoverData");
             isLayover = true;
         }
         FlightInfo = new flightInfo(scheduleResult, statusResult);
@@ -211,9 +211,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
             FlightInfoLayover = new flightInfo(scheduleResultLayover, statusResultLayover);
             //mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
         }
-        if(isLayover){
-            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
-        }
+
         setContentView(R.layout.activity_flight_info_display);
         mAirportText = (TextView) findViewById(R.id.airportText);
         mDateText = (TextView) findViewById(R.id.dateText);
@@ -234,6 +232,10 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mParkingDirBtn = (Button) findViewById(R.id.parking_directions);
         mLayoverDisplayCheckBox = (CheckBox) findViewById(R.id.layoverDisplayCheckBox);
         mLateFlightAckBtn = (Button) findViewById(R.id.late_flight_ack);
+
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
 
         final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -299,6 +301,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
 
         setToDeparture(); // have default screen be the departure information tab
+        navigation.setSelectedItemId(R.id.action_departure);
         departureLoc = mAirportText.getText();
         departureTerminal = mTerminalText.getText();
 
@@ -391,6 +394,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedLbl.setVisibility(View.INVISIBLE);
         mWeatherLbl.setVisibility(View.INVISIBLE);
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
+        mLayoverDisplayCheckBox.setVisibility(View.INVISIBLE);
     }
 
     protected void setToLayoverDeparture(){
