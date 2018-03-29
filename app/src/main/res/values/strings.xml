@@ -13,8 +13,9 @@
     <string name="departure_date">Departure Date</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
-
     </string>
+    <string name="input_layover_prompt">Input Layover Information Below</string>
+
     <string name="title_activity_flight_info_display">flightInfoDisplayActivity</string>
     <string name="title_airport">Airport:</string>
     <string name="title_date">Date:</string>
