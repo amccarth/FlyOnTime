@@ -568,9 +568,9 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
     private void practiceDatabase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        DatabaseReference myRef = database.getReference("ATL");
 
-        myRef.setValue("Hello, World!");
+        myRef.setValue("20 minutes");
 
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
