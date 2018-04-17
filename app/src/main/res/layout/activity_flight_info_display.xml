@@ -217,7 +217,7 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_below="@id/terminal_directions"
             android:layout_centerInParent="true"
-            android:text="Get Parking Options"
+            android:text="Get Directions in Airport"
             android:visibility="invisible"
             />
 

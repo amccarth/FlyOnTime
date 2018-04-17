@@ -222,7 +222,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         });
         mParkingDirBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+departureLoc+"airport parking"));//this does the same thing as the regular directions, need to find a way to differentiate
+                Intent intent = new Intent(v.getContext(), MapActivity.class);
                 startActivity(intent);
             }
         });
