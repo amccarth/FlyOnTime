@@ -17,12 +17,13 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.locuslabs.sdk.configuration.LocusLabs;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -268,8 +269,11 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         });
         mParkingDirBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("google.navigation:q="+departureLoc+"airport parking"));//this does the same thing as the regular directions, need to find a way to differentiate
+                LocusLabs.initialize(getApplicationContext(), "A1WU2AH1E6DJM6");
+                Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                 startActivity(intent);
+
+
             }
         });
         mTerminalDirBtn.setOnClickListener(new View.OnClickListener(){
@@ -488,6 +492,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
         new RetrieveWeatherTask().execute(FlightInfoLayover.arrAirport);
     }
+
 
     class RetrieveWeatherTask extends AsyncTask<String, Void, String> {
 
