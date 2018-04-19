@@ -2,7 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
+
     buildToolsVersion '27.0.3'
+
+
     defaultConfig {
         applicationId "adammccarthy.flyontime"
         applicationId "com.example.locuslabs.locuslab"
@@ -25,6 +28,9 @@ android {
         compile('com.locuslabs:sdk:+:release@aar') {
             transitive=true
         }
+        androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
         implementation fileTree(dir: 'libs', include: ['*.jar'])
         implementation 'com.android.support:appcompat-v7:26.1.0'
         implementation 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -33,9 +39,14 @@ android {
         testImplementation 'junit:junit:4.12'
         androidTestImplementation 'com.android.support.test:runner:1.0.1'
         androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
+        compile 'com.google.android.gms:play-services:12.0.0'
+        testCompile 'junit:junit:4.12'
+        compile 'com.google.firebase:firebase-core:12.0.0'
+        compile 'com.google.firebase:firebase-database:12.0.0'
 
     }
+    apply plugin: 'com.google.gms.google-services'
+
 
 
 

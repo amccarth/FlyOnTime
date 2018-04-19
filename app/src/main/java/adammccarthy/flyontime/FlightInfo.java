@@ -25,7 +25,10 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -70,6 +73,11 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
     private EditText mDepartDateView;
     private View mProgressView;
     private View mLoginFormView;
+    private CheckBox mLayoverCheckBox;
+    private LinearLayout mLayoverInfoView;
+    private boolean mIsLayover;
+    private AutoCompleteTextView mLayoverAirlineCodeView;
+    private EditText mLayoverFlightNumberView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +85,29 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
         setContentView(R.layout.activity_flight_info);
         // Set up the login form.
         mAirlineCodeView = (AutoCompleteTextView) findViewById(R.id.airline_code);
+        mLayoverAirlineCodeView = (AutoCompleteTextView) findViewById(R.id.layover_airline_code);
         populateAutoComplete();
 
+        mLayoverInfoView = (LinearLayout) findViewById(R.id.flight_layover_info_form);
+        mLayoverInfoView.setVisibility(View.INVISIBLE);
+        mIsLayover = false;
+        mLayoverCheckBox = (CheckBox) findViewById(R.id.layover_checkbox);
+
+        mLayoverCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    mLayoverInfoView.setVisibility(View.VISIBLE);
+                    mIsLayover = true;
+                }
+                else {
+                    mLayoverInfoView.setVisibility(View.INVISIBLE);
+                    mIsLayover = false;
+                }
+            }
+        });
+
+        mLayoverFlightNumberView = (EditText) findViewById(R.id.layover_flight_number);
         mFlightNumberView = (EditText) findViewById(R.id.flight_number);
         mFlightNumberView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -279,6 +308,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
         FlightStatusRetreiver statusRetreiver = new FlightStatusRetreiver(airlineCode, flightNumber, d);
         statusRetreiver.execute(airlineCode, flightNumber);
 
+
 //             try {
 //                 URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + airlineCode + "/" + flightNumber + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
 //                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -298,6 +328,8 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
 //        catch(Exception e){
 //            success = false;
 //        }
+
+
         boolean waiting = true;
         View focusView = null;
         while(waiting){
@@ -310,6 +342,11 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
                 Bundle bundle = new Bundle();
                 bundle.putString("scheduleData", scheduleResult);
                 bundle.putString("statusData", statusResult);
+                if(mIsLayover){
+                    layoverCalls();
+                    bundle.putString("scheduleLayoverData", scheduleResult);
+                    bundle.putString("statusLayoverData", statusResult);
+                }
                 intent.putExtras(bundle);
                 startActivity(intent);//launch activity to display data
             }
@@ -348,6 +385,46 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
 //        }
 
 
+    }
+
+    private void layoverCalls(){
+        mLayoverAirlineCodeView.setError(null);
+        mLayoverFlightNumberView.setError(null);
+        //string requestUrl = ApiKeys.fsScheduledFlightsByCarrierFNDate + airCode + "/" + fn + "/departing/" + year + "/" + month + "/" + day + "?appId=" + ApiKeys.fsAppID + "&appKey=+" + ApiKeys.fsAppKey;
+        // Store values at the time of the login attempt.
+        String airlineLayoverCode = mLayoverAirlineCodeView.getText().toString();
+        String flightLayoverNumber = mLayoverFlightNumberView.getText().toString();
+        String departureLayoverDate = mDepartDateView.getText().toString();
+        Date d = new Date();
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy HH:mm:sss");
+            d = dateFormat.parse(departureLayoverDate);
+        }
+        catch(Exception e){
+            //need to have some sort error correction in here for the date parsing
+        }
+
+        scheduleResult = "";
+        statusResult = "";
+        success1 = false;
+        success2 = false;
+        //  once making API calls add data verification in here
+        FlightScheduleRetreiver scheduleRetreiverLayover = new FlightScheduleRetreiver(airlineLayoverCode, flightLayoverNumber, d);
+        scheduleRetreiverLayover.execute(airlineLayoverCode, flightLayoverNumber);
+        FlightStatusRetreiver statusRetreiverLayover = new FlightStatusRetreiver(airlineLayoverCode, flightLayoverNumber, d);
+        statusRetreiverLayover.execute(airlineLayoverCode, flightLayoverNumber);
+
+        boolean waitingLayover = true;
+        View focusView = null;
+        while(waitingLayover){
+            if(success1 == false || success2 == false) {
+                continue;
+            }
+            else {
+                waitingLayover = false;
+                return;
+            }
+        }
     }
 
     private boolean isEmailValid(String email) {

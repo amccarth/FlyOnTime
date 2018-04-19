@@ -71,6 +71,12 @@
                 android:hint="@string/departure_date"
                 android:inputType="date" />
 
+            <CheckBox
+                android:id="@+id/layover_checkbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Layover?" />
+
             <Button
                 android:id="@+id/getFlightInfo"
                 style="?android:textAppearanceSmall"
@@ -80,6 +86,56 @@
                 android:text="@string/get_flight_info"
                 android:textStyle="bold" />
 
+            <LinearLayout
+                android:id="@+id/flight_layover_info_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/input_layover_prompt"
+                    android:textAlignment="center" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/layover_airline_code"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_airlineCode"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/layover_flight_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_flightNumber"
+                        android:imeActionId="@id/login"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true" />
+
+                </android.support.design.widget.TextInputLayout>
+
+            </LinearLayout>
+
         </LinearLayout>
+
+
     </ScrollView>
 </LinearLayout>

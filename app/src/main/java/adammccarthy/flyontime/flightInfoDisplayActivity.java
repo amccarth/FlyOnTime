@@ -9,13 +9,21 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.locuslabs.sdk.configuration.LocusLabs;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,8 +31,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -118,12 +128,17 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
     private Button mAirportDirBtn;
     private Button mTerminalDirBtn;
     private Button mParkingDirBtn;
+    private CheckBox mLayoverDisplayCheckBox;
 
     private Button mLateFlightAckBtn;
 
     private CharSequence departureLoc;
     private CharSequence departureTerminal;
     private flightInfo FlightInfo;
+    private flightInfo FlightInfoLayover;
+    private boolean isLayover;
+
+    private final String TAG = "Main Fly On Time Activity";
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -135,10 +150,20 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                     setToDirections();
                     return true;
                 case R.id.action_departure:
-                   setToDeparture();
+                    if(isLayover && mLayoverDisplayCheckBox.isChecked()){
+                        setToLayoverDeparture();
+                    }
+                    else{
+                        setToDeparture();
+                    }
                     return true;
                 case R.id.action_arrival:
-                    setToArrival();
+                    if(isLayover && mLayoverDisplayCheckBox.isChecked()){
+                        setToLayoverArrival();
+                    }
+                    else {
+                        setToArrival();
+                    }
                     return true;
             }
             return false;
@@ -186,13 +211,29 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         String scheduleResult = "";
         String statusResult = "";
+        String scheduleResultLayover = "";
+        String statusResultLayover = "";
+        isLayover = false;
         if(bundle.containsKey("scheduleData")){
             scheduleResult = bundle.getString("scheduleData");
         }
         if(bundle.containsKey("statusData")){
             statusResult = bundle.getString("statusData");
         }
+        if(bundle.containsKey("scheduleLayoverData")){
+            scheduleResultLayover = bundle.getString("scheduleLayoverData");
+            isLayover = true;
+        }
+        if(bundle.containsKey("statusLayoverData")){
+            statusResultLayover = bundle.getString("statusLayoverData");
+            isLayover = true;
+        }
         FlightInfo = new flightInfo(scheduleResult, statusResult);
+        if(!(scheduleResultLayover.isEmpty()) && !(statusResultLayover.isEmpty())){
+            FlightInfoLayover = new flightInfo(scheduleResultLayover, statusResultLayover);
+            //mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
+
         setContentView(R.layout.activity_flight_info_display);
         mAirportText = (TextView) findViewById(R.id.airportText);
         mDateText = (TextView) findViewById(R.id.dateText);
@@ -211,10 +252,14 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mAirportDirBtn = (Button) findViewById(R.id.airport_directions);
         mTerminalDirBtn = (Button) findViewById(R.id.terminal_directions);
         mParkingDirBtn = (Button) findViewById(R.id.parking_directions);
-
+        mLayoverDisplayCheckBox = (CheckBox) findViewById(R.id.layoverDisplayCheckBox);
         mLateFlightAckBtn = (Button) findViewById(R.id.late_flight_ack);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
+
+        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mAirportDirBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -260,10 +305,32 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
             }
         });
 
+        mLayoverDisplayCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(mLayoverDisplayCheckBox.isChecked() && navigation.getSelectedItemId() == R.id.action_departure){
+                    setToLayoverDeparture();
+                }
+                else if(mLayoverDisplayCheckBox.isChecked() && navigation.getSelectedItemId() == R.id.action_arrival){
+                    setToLayoverArrival();
+                }
+                else if(!mLayoverDisplayCheckBox.isChecked() && navigation.getSelectedItemId() == R.id.action_departure){
+                    setToDeparture();
+                }
+                else if(!mLayoverDisplayCheckBox.isChecked() && navigation.getSelectedItemId() == R.id.action_arrival){
+                    setToArrival();
+                }
+            }
+        });
+
+
+
         setToDeparture(); // have default screen be the departure information tab
+        navigation.setSelectedItemId(R.id.action_departure);
         departureLoc = mAirportText.getText();
         departureTerminal = mTerminalText.getText();
 
+        practiceDatabase();
     }
     protected void setToDeparture(){
         //change all text to departure information, change all of these when actually getting api calls
@@ -290,7 +357,11 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setVisibility(View.VISIBLE);
         mEstimatedText.setText(FlightInfo.depEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-        mWeatherText.setText("Sunny, 85°F");
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
+
+
 
         //Need to discus
         //google maps api call example
@@ -331,9 +402,11 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedText.setVisibility(View.VISIBLE);
         mEstimatedText.setText(FlightInfo.arrEstimated);
         mWeatherText.setVisibility(View.VISIBLE);
-        mWeatherText.setText("Rainy, 87°F");
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
         new RetrieveWeatherTask().execute(FlightInfo.arrAirport);
+        if(isLayover){
+            mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        }
     }
     protected void setToDirections(){
         //make directions buttons visible and remove everything else
@@ -355,7 +428,72 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         mEstimatedLbl.setVisibility(View.INVISIBLE);
         mWeatherLbl.setVisibility(View.INVISIBLE);
         mLateFlightAckBtn.setVisibility(View.INVISIBLE);
+        mLayoverDisplayCheckBox.setVisibility(View.INVISIBLE);
     }
+
+    protected void setToLayoverDeparture(){
+        //change all text to departure information, change all of these when actually getting api calls
+        mAirportDirBtn.setVisibility(View.INVISIBLE);
+        mTerminalDirBtn.setVisibility(View.INVISIBLE);
+        mParkingDirBtn.setVisibility(View.INVISIBLE);
+        mAirportLbl.setVisibility(View.VISIBLE);
+        mGateLbl.setVisibility(View.VISIBLE);
+        mTerminalLbl.setVisibility(View.VISIBLE);
+        mScheduledLbl.setVisibility(View.VISIBLE);
+        mDateLbl.setVisibility(View.VISIBLE);
+        mEstimatedLbl.setVisibility(View.VISIBLE);
+        mWeatherLbl.setVisibility(View.VISIBLE);
+        mAirportText.setVisibility(View.VISIBLE);
+        mAirportText.setText(FlightInfoLayover.depAirport);
+        mGateText.setVisibility(View.VISIBLE);
+        mGateText.setText(FlightInfoLayover.depGate);
+        mTerminalText.setVisibility(View.VISIBLE);
+        mTerminalText.setText(FlightInfoLayover.depTerminal);
+        mScheduledText.setVisibility(View.VISIBLE);
+        mScheduledText.setText(FlightInfoLayover.depTime);
+        mDateText.setVisibility(View.VISIBLE);
+        mDateText.setText(FlightInfoLayover.depDay);
+        mEstimatedText.setVisibility(View.VISIBLE);
+        mEstimatedText.setText(FlightInfoLayover.depEstimated);
+        mWeatherText.setVisibility(View.VISIBLE);
+
+        if(System.currentTimeMillis() < System.currentTimeMillis() + 10000000) {
+            mLateFlightAckBtn.setVisibility(View.VISIBLE);
+        }
+
+        new RetrieveWeatherTask().execute(FlightInfoLayover.depAirport);
+        mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+    }
+    protected void setToLayoverArrival(){
+        mAirportDirBtn.setVisibility(View.INVISIBLE);
+        mTerminalDirBtn.setVisibility(View.INVISIBLE);
+        mParkingDirBtn.setVisibility(View.INVISIBLE);
+        mAirportLbl.setVisibility(View.VISIBLE);
+        mGateLbl.setVisibility(View.VISIBLE);
+        mTerminalLbl.setVisibility(View.VISIBLE);
+        mScheduledLbl.setVisibility(View.VISIBLE);
+        mDateLbl.setVisibility(View.VISIBLE);
+        mEstimatedLbl.setVisibility(View.VISIBLE);
+        mWeatherLbl.setVisibility(View.VISIBLE);
+        mAirportText.setVisibility(View.VISIBLE);
+        mAirportText.setText(FlightInfoLayover.arrAirport);
+        mGateText.setVisibility(View.VISIBLE);
+        mGateText.setText(FlightInfoLayover.arrGate);
+        mTerminalText.setVisibility(View.VISIBLE);
+        mTerminalText.setText(FlightInfoLayover.arrTerminal);
+        mScheduledText.setVisibility(View.VISIBLE);
+        mScheduledText.setText(FlightInfoLayover.arrTime);
+        mDateText.setVisibility(View.VISIBLE);
+        mDateText.setText(FlightInfoLayover.arrDay);
+        mEstimatedText.setVisibility(View.VISIBLE);
+        mEstimatedText.setText(FlightInfoLayover.arrEstimated);
+        mWeatherText.setVisibility(View.VISIBLE);
+        mLateFlightAckBtn.setVisibility(View.INVISIBLE);
+        mLayoverDisplayCheckBox.setVisibility(View.VISIBLE);
+        new RetrieveWeatherTask().execute(FlightInfoLayover.arrAirport);
+    }
+
+
     class RetrieveWeatherTask extends AsyncTask<String, Void, String> {
 
         protected String weatherResult = "";
@@ -412,11 +550,15 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
 
                 String jsonString4 = jObject2.getString("temperatureCelsius");
                 //String tempString = jsonString4.substring(1, (jsonString4.length() - 1));
-                double temp = Double.parseDouble(jsonString4) * (9/5) + 32;
+                double tempC = Double.parseDouble(jsonString4);
+                double tempF = tempC * 1.8 + 32;
+
+                DecimalFormat df = new DecimalFormat("#.##");
+                df.setRoundingMode(RoundingMode.HALF_UP);
 
                 result.append(weather);
                 result.append(" ");
-                result.append(temp);
+                result.append(df.format(tempF));
                 result.append("\u00b0F");
 
                 mWeatherText.setText(result);
@@ -427,5 +569,29 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    private void practiceDatabase() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("ATL");
+
+        myRef.setValue("20 minutes");
+
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "Value is: " + value);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
     }
 }
