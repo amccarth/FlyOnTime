@@ -105,8 +105,19 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                 //might have to use getString instead of getJsonString, will have to try it first
             }
             catch (JSONException e){
-                int test = 0;
-                // throw some sort of error
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(flightInfoDisplayActivity.this);
+                alertDialogBuilder.setTitle("Error");
+                alertDialogBuilder.setMessage("There is some error with flight information, either the flight is invalid or something was entered incorrectly. Please try again.");
+                alertDialogBuilder.setCancelable(false);
+                alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with discard
+                        finish();
+                    }
+                });
+
+                alertDialogBuilder.show();
             }
         }
     }
@@ -170,40 +181,7 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         }
 
     };
-    //function from the original project to do main api call
-//    public JsonResult getFlightSchedule(string airCode, string fn, string year, string month, string day)
-//    {
-//        string requestUrl = ApiKeys.fsScheduledFlightsByCarrierFNDate + airCode + "/" + fn + "/departing/" + year + "/" + month + "/" + day + "?appId=" + ApiKeys.fsAppID + "&appKey=+" + ApiKeys.fsAppKey;
-//
-//        WebClient client = new WebClient();
-//        string information = client.DownloadString(requestUrl);
-//
-//        return Json(information, JsonRequestBehavior.AllowGet);
-//    }
 
-    //below is example from the internet on api calls in android, need to convert above to this
-//     try {
-//        URL url = new URL(API_URL + "email=" + email + "&apiKey=" + API_KEY);
-//        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-//            StringBuilder stringBuilder = new StringBuilder();
-//            String line;
-//            while ((line = bufferedReader.readLine()) != null) {
-//                stringBuilder.append(line).append("\n");
-//            }
-//            bufferedReader.close();
-//            return stringBuilder.toString();
-//        }
-//        finally{
-//            urlConnection.disconnect();
-//        }
-//    }
-//            catch(Exception e) {
-//        Log.e("ERROR", e.getMessage(), e);
-//        return null;
-//    }
-//}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -269,8 +247,22 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
         });
         mParkingDirBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                String airport="";
+                switch(FlightInfo.depAirport){
+                    case("ATL"): airport = "atl";
+                                 break;
+                    case("LAX"): airport = "lax";
+                                 break;
+                    case("SEA"): airport = "sea";
+                                 break;
+                    default: airport = "atl";
+                    break;
+                }
                 LocusLabs.initialize(getApplicationContext(), "A1WU2AH1E6DJM6");
+                Bundle bundle = new Bundle();
+                bundle.putString("airportString", airport);
                 Intent intent = new Intent(getApplicationContext(), MapActivity.class);
+                intent.putExtras(bundle);
                 startActivity(intent);
 
 

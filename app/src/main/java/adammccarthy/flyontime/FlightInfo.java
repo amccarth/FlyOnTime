@@ -42,30 +42,17 @@ import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
+
 public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
+
     public String scheduleResult = "";
     public String statusResult = "";
     public boolean success1 = false;
     public boolean success2 = false;
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
-    private UserLoginTask mAuthTask = null;
+
+
+
 
     // UI references.
     private AutoCompleteTextView mAirlineCodeView;
@@ -86,7 +73,7 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
         // Set up the login form.
         mAirlineCodeView = (AutoCompleteTextView) findViewById(R.id.airline_code);
         mLayoverAirlineCodeView = (AutoCompleteTextView) findViewById(R.id.layover_airline_code);
-        populateAutoComplete();
+
 
         mLayoverInfoView = (LinearLayout) findViewById(R.id.flight_layover_info_form);
         mLayoverInfoView.setVisibility(View.INVISIBLE);
@@ -135,48 +122,10 @@ public class FlightInfo extends AppCompatActivity implements LoaderCallbacks<Cur
         mProgressView = findViewById(R.id.flight_info_form);
     }
 
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
 
-        getLoaderManager().initLoader(0, null, this);
-    }
 
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mAirlineCodeView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
 
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
-    }
+
 
     //need to find a way to pass multiple parameters to this, also need to parse date when getting. API call works need to find a way to parse out relevant info and pass to next activity
 class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
@@ -220,11 +169,8 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
     }
         @Override
         protected void onPostExecute(String result){
-           //Intent intent = new Intent(super., flightInfoDisplayActivity.class);
-            //flightInfoDisplayActivity.getApplicationContext().startActivity(new Intent(FlightInfo.this, flightInfoDisplayActivity.class));
             success1 = true;
             scheduleResult = result;
-            //launch activity to display data
     }
 }
     class FlightStatusRetreiver extends AsyncTask<String, Void, String>{
@@ -268,29 +214,20 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
         }
         @Override
         protected void onPostExecute(String result){
-            //Intent intent = new Intent(super., flightInfoDisplayActivity.class);
-            //flightInfoDisplayActivity.getApplicationContext().startActivity(new Intent(FlightInfo.this, flightInfoDisplayActivity.class));
+
             success2 = true;
             statusResult = result;
-            //launch activity to display data
+
         }
     }
 
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
+
     private void attemptGetFlightInfo() {
-        if (mAuthTask != null) {
-            return;
-        }
+
 
         // Reset errors.
         mAirlineCodeView.setError(null);
         mFlightNumberView.setError(null);
-        //string requestUrl = ApiKeys.fsScheduledFlightsByCarrierFNDate + airCode + "/" + fn + "/departing/" + year + "/" + month + "/" + day + "?appId=" + ApiKeys.fsAppID + "&appKey=+" + ApiKeys.fsAppKey;
-        // Store values at the time of the login attempt.
         String airlineCode = mAirlineCodeView.getText().toString();
         String flightNumber = mFlightNumberView.getText().toString();
         String departureDate = mDepartDateView.getText().toString();
@@ -300,7 +237,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
             d = dateFormat.parse(departureDate);
         }
         catch(Exception e){
-            //need to have some sort error correction in here for the date parsing
+
         }
         //  once making API calls add data verification in here
         FlightScheduleRetreiver scheduleRetreiver = new FlightScheduleRetreiver(airlineCode, flightNumber, d);
@@ -309,25 +246,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
         statusRetreiver.execute(airlineCode, flightNumber);
 
 
-//             try {
-//                 URL url = new URL(getResources().getString(R.string.fsScheduledFlightsByCarrierFNDate) + airlineCode + "/" + flightNumber + "/departing/" + "2018/02/12" + "?appId=" + getResources().getString(R.string.fsAppID) + "&appKey=+" + getResources().getString(R.string.fsAppKey));
-//                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//                 try {
-//                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-//                     StringBuilder stringBuilder = new StringBuilder();
-//                     String line;
-//                     while ((line = bufferedReader.readLine()) != null) {
-//                         stringBuilder.append(line).append("\n");
-//                     }
-//                     bufferedReader.close();
-//                     String test = stringBuilder.toString();
-//                 } finally {
-//                     urlConnection.disconnect();
-//                 }
-//             }
-//        catch(Exception e){
-//            success = false;
-//        }
+
 
 
         boolean waiting = true;
@@ -351,38 +270,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
                 startActivity(intent);//launch activity to display data
             }
         }
-//code below is from original login form code, don't think we'll need but keeping there just in case
-        //instead of that need to have in place the api calls to get flightinfo from information entered, for now no verifcation of data
 
-        // Check for a valid password, if the user entered one.
-//        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-//            mFlightNumberView.setError(getString(R.string.error_invalid_password));
-//            focusView = mFlightNumberView;
-//            cancel = true;
-//        }
-//
-//        // Check for a valid email address.
-//        if (TextUtils.isEmpty(email)) {
-//            mAirlineCodeView.setError(getString(R.string.error_field_required));
-//            focusView = mAirlineCodeView;
-//            cancel = true;
-//        } else if (!isEmailValid(email)) {
-//            mAirlineCodeView.setError(getString(R.string.error_invalid_email));
-//            focusView = mAirlineCodeView;
-//            cancel = true;
-//        }
-//
-//        if (cancel) {
-//            // There was an error; don't attempt login and focus the first
-//            // form field with an error.
-//            focusView.requestFocus();
-//        } else {
-//            // Show a progress spinner, and kick off a background task to
-//            // perform the user login attempt.
-//            showProgress(true);
-//            mAuthTask = new UserLoginTask(email, password);
-//            mAuthTask.execute((Void) null);
-//        }
 
 
     }
@@ -427,15 +315,7 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
         }
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }
 
     /**
      * Shows the progress UI and hides the login form.
@@ -527,62 +407,10 @@ class FlightScheduleRetreiver extends AsyncTask<String, Void, String>{
         int IS_PRIMARY = 1;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
-        }
 
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mFlightNumberView.setError(getString(R.string.error_incorrect_password));
-                mFlightNumberView.requestFocus();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
-    }
 
 }
 

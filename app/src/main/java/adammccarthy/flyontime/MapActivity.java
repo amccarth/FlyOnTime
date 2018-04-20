@@ -7,6 +7,7 @@ package adammccarthy.flyontime;
 //package com.example.locuslabs.locuslab;
 
         import android.Manifest;
+        import android.content.Intent;
         import android.os.Build;
         import android.os.Bundle;
         import android.support.annotation.NonNull;
@@ -39,6 +40,7 @@ public class MapActivity extends AppCompatActivity {
     private AirportDatabase airportDatabase;
     private MapView mapView;
     private Airport airport;
+    private String airportString;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +65,13 @@ public class MapActivity extends AppCompatActivity {
 
             initializeLocusLabsDatabase();
         }
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if(bundle.containsKey("airportString")){
+            airportString = bundle.getString("airportString");
+        }
+        else
+            airportString = "atl";
     }
 
     @Override
@@ -92,7 +101,7 @@ public class MapActivity extends AppCompatActivity {
             public void onReady() {
 
                 airportDatabase = new AirportDatabase();
-                loadVenueAndMap("lax", "");
+                loadVenueAndMap(airportString, "");
             }
         });
     }

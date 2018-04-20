@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "adammccarthy.flyontime"
-        applicationId "com.example.locuslabs.locuslab"
+        //applicationId "com.example.locuslabs.locuslab"
         minSdkVersion 24
         targetSdkVersion 26
         versionCode 1
