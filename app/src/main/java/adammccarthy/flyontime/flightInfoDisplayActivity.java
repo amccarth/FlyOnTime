@@ -116,6 +116,12 @@ public class flightInfoDisplayActivity extends AppCompatActivity {
                         finish();
                     }
                 });
+                alertDialogBuilder.setNegativeButton("IGNORE", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+
+                    }
+                });
 
                 alertDialogBuilder.show();
             }
